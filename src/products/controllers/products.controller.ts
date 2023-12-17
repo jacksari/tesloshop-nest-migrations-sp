@@ -36,7 +36,15 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+
+    const product = await this.productsService.findOne(+id);
+
+    if (!product) {
+      throw new NotFoundException('Producto no existe');
+    }
+
     return this.productsService.remove(+id);
   }
+
 }

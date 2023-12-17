@@ -26,10 +26,7 @@ export class ProductsService {
 
     try {
       // save product
-      const product = this.productsRepository.create({
-        ...createProductDto,
-        slug: this.getSlugByTitle(createProductDto.title),
-      });
+      const product = this.productsRepository.create(createProductDto);
       await queryRunner.manager.save(product);
 
       // save product sizes
@@ -44,7 +41,7 @@ export class ProductsService {
       // commit transaction
       await queryRunner.commitTransaction();
       return {
-        message: 'Product created successfully',
+        message: 'Producto creado correctamente',
         ok: true
       }
 
@@ -56,7 +53,6 @@ export class ProductsService {
 
   async findAll() {
     const [data] = await this.dataSource.query('call sp_get_products()');
-    // console.log(query[0]);
     return {
       ok: true,
       products: data
@@ -64,15 +60,20 @@ export class ProductsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} product`;
+    return this.productsRepository.findOneBy({ id });
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    await this.productSizesRepository.delete({ product: { id } });
+    await this.productsRepository.delete(id);
+    return {
+      message: 'Producto eliminado correctamente',
+      ok: true
+    }
   }
 
   async existTitle(title: string) {
@@ -87,4 +88,5 @@ export class ProductsService {
   getSlugByTitle(title: string) {
     return title.toLowerCase().replace(/ /g, '-');
   }
+
 }

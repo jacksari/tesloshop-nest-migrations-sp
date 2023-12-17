@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Size } from "./size.entity";
 import { ProductSize } from "./productSize.entity";
 
@@ -51,4 +51,8 @@ export class Product {
     @OneToMany(() => ProductSize, (productSize) => productSize.product)
     productSizes: ProductSize[];
 
+    @BeforeInsert()
+    checkSlugInsert() {
+        this.slug = this.title.toLowerCase().replace(/ /g, '-');
+    }
 }
