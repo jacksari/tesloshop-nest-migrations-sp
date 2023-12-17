@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
+import { TypeOrmConfigService } from './config/typeorm-config.service';
 
 @Module({
   imports: [
@@ -16,10 +17,16 @@ import { ProductsModule } from './products/products.module';
       entities: [],
       synchronize: true,
       autoLoadEntities: true,
+      migrations: ['src/migrations/*.ts'],
+      migrationsRun: true,
+      migrationsTableName: 'migrations_typeorm',
+    }),
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmConfigService,
     }),
     ProductsModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,7 +30,7 @@ export class ProductsService {
         ...createProductDto,
         slug: this.getSlugByTitle(createProductDto.title),
       });
-      const savedProduct = await queryRunner.manager.save(product);
+      await queryRunner.manager.save(product);
 
       // save product sizes
       const productSizes = this.productSizesRepository.create(
@@ -45,23 +45,23 @@ export class ProductsService {
       await queryRunner.commitTransaction();
       return {
         message: 'Product created successfully',
-        // product: savedProduct,
         ok: true
       }
 
     } catch (err) {
       await queryRunner.rollbackTransaction();
-      console.log(err.message);
-      return {
-        message: 'Error al crear el producto',
-        // error: err.message,
-        ok: false
-      }
+      throw new HttpException('Error al crear el producto', 500);
     }
   }
 
   findAll() {
-    return `This action returns all products`;
+    return this.productsRepository.find({
+      relations: {
+        productSizes: {
+          size: true,
+        }
+      }
+    });
   }
 
   findOne(id: number) {

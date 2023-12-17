@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpException } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
@@ -13,7 +13,7 @@ export class ProductsController {
     const existProduct = await this.productsService.existTitle(createProductDto.title);
 
     if (existProduct) {
-      return { message: 'Product already exists' };
+      throw new HttpException('Producto ya existe', 400);
     }
 
     const productSave = await this.productsService.create(createProductDto);

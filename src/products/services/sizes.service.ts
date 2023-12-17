@@ -23,4 +23,11 @@ export class SizesService {
     async getAll() {
         return await this.sizesRepository.find();
     }
+
+    async getAllProductsBySize(size_id: number) {
+        return await this.sizesRepository.find({
+            where: { id: size_id },
+            relations: ['productSizes']
+        });
+    }
 }

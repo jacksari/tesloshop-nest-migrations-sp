@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreateSizeDto } from '../dto/create-size.dto';
 import { SizesService } from '../services/sizes.service';
 
@@ -27,5 +27,14 @@ export class SizesController {
     @Get()
     async getAll() {
         return await this.sizesService.getAll();
+    }
+
+    @Get('products/:size_id')
+    async getAllProductsBySize(
+        @Param('size_id') size_id: number
+    ) {
+        return await this.sizesService.getAllProductsBySize(
+            size_id
+        );
     }
 }
