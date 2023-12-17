@@ -54,14 +54,13 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return this.productsRepository.find({
-      relations: {
-        productSizes: {
-          size: true,
-        }
-      }
-    });
+  async findAll() {
+    const [data] = await this.dataSource.query('call sp_get_products()');
+    // console.log(query[0]);
+    return {
+      ok: true,
+      products: data
+    };
   }
 
   findOne(id: number) {

@@ -13,9 +13,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             synchronize: false, // Puedes cambiar a true para sincronizar automáticamente (no recomendado en producción)
             migrationsTableName: 'migration_table',
             migrations: [__dirname + '/migrations/*{.ts,.js}'],
-            cli: {
-                migrationsDir: 'src/migrations',
-            },
+            // cli: {
+            //     migrationsDir: 'src/migrations',
+            // },
         };
     }
 }

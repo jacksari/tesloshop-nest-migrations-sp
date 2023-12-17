@@ -6,7 +6,11 @@ import { TypeOrmConfigService } from './config/typeorm-config.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      
+    }),
     TypeOrmModule.forRoot({
       type: process.env.DB_CONNECTION as any,
       host: process.env.DB_HOST,
@@ -17,13 +21,13 @@ import { TypeOrmConfigService } from './config/typeorm-config.service';
       entities: [],
       synchronize: true,
       autoLoadEntities: true,
-      migrations: ['src/migrations/*.ts'],
-      migrationsRun: true,
-      migrationsTableName: 'migrations_typeorm',
+      migrations: [],
+      // migrationsRun: true,
+      // migrationsTableName: 'migrations_typeorm',
     }),
-    TypeOrmModule.forRootAsync({
-      useClass: TypeOrmConfigService,
-    }),
+    // TypeOrmModule.forRootAsync({
+    //   useClass: TypeOrmConfigService,
+    // }),
     ProductsModule,
   ],
   controllers: [],
