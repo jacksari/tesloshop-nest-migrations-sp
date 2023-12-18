@@ -1,13 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpException, Query, Res, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from '../services/products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
+import { GetProductsDto } from '../dto/get-products.dto';
+import { Response } from 'express';
+import { ResponseInterceptor } from 'src/interceptors/response.interceptor';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) { }
+  constructor(
+    private readonly productsService: ProductsService
+  ) { }
 
   @Post()
+
   async create(@Body() createProductDto: CreateProductDto) {
 
     const existProduct = await this.productsService.existTitle(createProductDto.title);
@@ -21,8 +27,11 @@ export class ProductsController {
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  @UseInterceptors(ResponseInterceptor)
+  findAll(
+    @Query() getProductsDto: GetProductsDto,
+  ) {
+    return this.productsService.findProducts(getProductsDto);
   }
 
   @Get(':id')

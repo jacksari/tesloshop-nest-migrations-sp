@@ -22,4 +22,7 @@ export class CreateProductDto {
 
     @IsArray()
     sizes: number[];
+
+    @IsArray()
+    tags: string[];
 }

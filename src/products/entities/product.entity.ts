@@ -48,6 +48,9 @@ export class Product {
     })
     gender: GenderProduct;
 
+    @Column('json')
+    tags: string[];
+
     @OneToMany(() => ProductSize, (productSize) => productSize.product)
     productSizes: ProductSize[];
 

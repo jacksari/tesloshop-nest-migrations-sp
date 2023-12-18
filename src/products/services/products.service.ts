@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entities/product.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import { ProductSize } from '../entities/productSize.entity';
+import { PaginatedData, pagination } from 'src/helpers/paginate.helper';
+import { GetProductsDto } from '../dto/get-products.dto';
 
 @Injectable()
 export class ProductsService {
@@ -51,12 +53,21 @@ export class ProductsService {
     }
   }
 
-  async findAll() {
-    const [data] = await this.dataSource.query('call sp_get_products()');
-    return {
-      ok: true,
-      products: data
-    };
+  async findProducts(
+    getProductsDto: GetProductsDto
+  ): Promise<PaginatedData<Product>> {
+    const { page, perpage, search } = getProductsDto;
+
+    const query = 'call sp_get_products(?, ?, ?)';
+    const params = [page, perpage, search];
+
+    const [data] = await this.dataSource.query(query, params);
+    
+    return pagination(
+      data,
+      page,
+      perpage
+    );
   }
 
   findOne(id: number) {
