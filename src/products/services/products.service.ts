@@ -7,6 +7,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import { ProductSize } from '../entities/productSize.entity';
 import { PaginatedData, pagination } from 'src/helpers/paginate.helper';
 import { GetProductsDto } from '../dto/get-products.dto';
+import { ProductImage } from '../entities/productImage.entity';
 
 @Injectable()
 export class ProductsService {
@@ -16,6 +17,8 @@ export class ProductsService {
     private readonly productsRepository: Repository<Product>,
     @InjectRepository(ProductSize)
     private readonly productSizesRepository: Repository<ProductSize>,
+    @InjectRepository(ProductImage)
+    private readonly productImagesRepository: Repository<ProductImage>,
     private readonly dataSource: DataSource,
   ) { }
 
@@ -27,8 +30,13 @@ export class ProductsService {
     await queryRunner.startTransaction();
 
     try {
+      const { images = [], ...productDetails } = createProductDto;
       // save product
-      const product = this.productsRepository.create(createProductDto);
+      const product = this.productsRepository.create({
+        ...productDetails,
+        images: createProductDto.images?.map(url => this.productImagesRepository.create({ url })),
+        // productSizes: createProductDto.sizes.map(id => this.productSizesRepository.create({ size: {id} }))
+      });
       await queryRunner.manager.save(product);
 
       // save product sizes
@@ -62,7 +70,7 @@ export class ProductsService {
     const params = [page, perpage, search];
 
     const [data] = await this.dataSource.query(query, params);
-    
+
     return pagination(
       data,
       page,
@@ -79,8 +87,8 @@ export class ProductsService {
   }
 
   async remove(id: number) {
-    await this.productSizesRepository.delete({ product: { id } });
-    await this.productsRepository.delete(id);
+    const product = await this.findOne(id);
+    await this.productsRepository.remove(product);
     return {
       message: 'Producto eliminado correctamente',
       ok: true

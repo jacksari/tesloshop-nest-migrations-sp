@@ -1,4 +1,4 @@
-import { IsArray, IsDecimal, IsEnum, IsNumber, IsString, Validate } from "class-validator";
+import { IsArray, IsDecimal, IsEnum, IsNumber, IsOptional, IsString, Validate } from "class-validator";
 import { GenderProduct } from "../entities/product.entity";
 import { ProductSize } from "../entities/productSize.entity";
 import { Type } from "class-transformer";
@@ -25,4 +25,8 @@ export class CreateProductDto {
 
     @IsArray()
     tags: string[];
+
+    @IsOptional()
+    @IsArray()
+    images: string[];
 }

@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class sp_get_products1702805855984 implements MigrationInterface {
+export class sp_get_products1702805855988 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Agrega aquí tus operaciones de migración
         await queryRunner.query('DROP PROCEDURE IF EXISTS sp_get_products');
@@ -24,8 +24,9 @@ export class sp_get_products1702805855984 implements MigrationInterface {
                 select
                     p.id,
                     p.title,
-                    si.sizes,
+                    ifnull(si.sizes, json_array()) sizes,
                     p.tags,
+                    ifnull(pi.images, json_array()) images,
                     _total total
                 from product p
                 left join (
@@ -39,6 +40,13 @@ export class sp_get_products1702805855984 implements MigrationInterface {
                     join sizes s on s.id = ps.size_id
                     group by ps.product_id
                 ) si on si.product_id = p.id
+                left join (
+                    select
+                        json_arrayagg(pi.url) images,
+                        pi.product_id
+                    from product_images pi
+                    group by pi.product_id
+                ) pi on pi.product_id = p.id
                 where if(_search is not null, p.title like concat('%', _search, '%'), 1)
                 order by p.id desc
                 limit _perpage offset _offset;

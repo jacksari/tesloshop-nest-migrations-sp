@@ -12,7 +12,9 @@ export class ProductSize {
     // Otros campos que quieras agregar a la tabla pivot
 
     // Relación con la entidad Product
-    @ManyToOne(() => Product, (product) => product.productSizes)
+    @ManyToOne(() => Product, (product) => product.productSizes, {
+        onDelete: 'CASCADE',
+    })
     @JoinColumn({ name: "product_id" })
     product: Product;
 

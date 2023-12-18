@@ -1,6 +1,7 @@
 import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Size } from "./size.entity";
 import { ProductSize } from "./productSize.entity";
+import { ProductImage } from "./productImage.entity";
 
 export enum GenderProduct {
     HOMBRE = 'HOMBRE',
@@ -51,11 +52,17 @@ export class Product {
     @Column('json')
     tags: string[];
 
-    @OneToMany(() => ProductSize, (productSize) => productSize.product)
+    @OneToMany(() => ProductSize, (productSize) => productSize.product, { cascade: true })
     productSizes: ProductSize[];
+
+    @OneToMany(() => ProductImage, (productImage) => productImage.product, {
+        cascade: true,
+    })
+    images?: ProductImage[];
 
     @BeforeInsert()
     checkSlugInsert() {
         this.slug = this.title.toLowerCase().replace(/ /g, '-');
     }
+
 }
